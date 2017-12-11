@@ -7,7 +7,12 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+gem "rubyzip"
+
 group :development, :test do
+  gem "epub-parser"
+  gem "pry"
+  gem "rspec"
 end
 
 group :test do
