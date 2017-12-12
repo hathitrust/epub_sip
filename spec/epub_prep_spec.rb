@@ -13,6 +13,10 @@ RSpec.describe EPUBPreparer do
   let(:output) { Tempfile.new("epubprep") }
   let(:subject) { described_class.new(input, output.path) }
 
+  def yaml_safe_load(data)
+    YAML.safe_load(data, [Time])
+  end
+
   def zip_entry(filename)
     Zip::File.open(output.path) do |zipfile|
       yield zipfile.get_entry(filename)
@@ -21,13 +25,13 @@ RSpec.describe EPUBPreparer do
 
   def compare_yml_subsec(section, subsection)
     zip_entry("meta.yml") do |entry|
-      expect(YAML.safe_load(entry.get_input_stream.read)[section][subsection]).to eql(YAML.safe_load(File.read("#{fixture}/meta.yml"))[section][subsection])
+      expect(yaml_safe_load(entry.get_input_stream.read)[section][subsection]).to eql(yaml_safe_load(File.read("#{fixture}/meta.yml"))[section][subsection])
     end
   end
 
   def compare_yml_sec(section)
     zip_entry("meta.yml") do |entry|
-      expect(YAML.safe_load(entry.get_input_stream.read)[section]).to eql(YAML.safe_load(File.read("#{fixture}/meta.yml"))[section])
+      expect(yaml_safe_load(entry.get_input_stream.read)[section]).to eql(yaml_safe_load(File.read("#{fixture}/meta.yml"))[section])
     end
   end
 
