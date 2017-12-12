@@ -5,38 +5,42 @@ require "epub/parser"
 require "digest"
 require "html_reader"
 
-class EPUBPreparer
-  def initialize(epub_path, output)
+class EPUB::SIPWriter
+  def initialize(pt_objid, epub_path)
+    @pt_objid = pt_objid
     @epub_path = epub_path
-    @output = output
-
-    @epub = EPUB::Parser.parse(epub_path)
   end
 
-  def run
-    write_zip
+  def write_zip(output)
+    preparer = EPUB::Preparer.new(epub_path)
+
+    Zip::File.open(output, Zip::File::CREATE) do |zipfile|
+      zipfile.get_output_stream("meta.yml") do |f|
+        f.write(preparer.meta_yml)
+      end
+
+      n = 0
+      preparer.spine_pages.each do |page|
+        n += 1
+        zipfile.get_output_stream("%08d.txt" % n) do |f|
+          f.write(HTMLReader.new(page).plain_text)
+        end
+      end
+
+      zipfile.add("#{pt_objid}.epub", epub_path)
+    end
   end
 
   private
 
-  def write_zip
-    Zip::File.open(output, Zip::File::CREATE) do |zipfile|
-      zipfile.get_output_stream("meta.yml") do |f|
-        f.write(meta_yml)
-      end
+  attr_reader :pt_objid, :epub_path
+end
 
-      n = 0
-      epub.spine.items.each do |item|
-        n += 1
-        zipfile.get_output_stream("%08d.txt" % n) do |f|
-          f.write(epub_item_to_plain_text(item))
-        end
-      end
-    end
-  end
+class EPUB::Preparer
+  def initialize(epub_path)
+    @epub_path = epub_path
 
-  def epub_item_to_plain_text(epub_item)
-    HTMLReader.new(epub_item.content_document.read).plain_text
+    @epub = EPUB::Parser.parse(epub_path)
   end
 
   def meta_yml
@@ -47,6 +51,12 @@ class EPUBPreparer
       "pagedata" => pagedata,
     )
   end
+
+  def spine_pages
+    epub.spine.items.map {|item| item.content_document.read}
+  end
+
+  private
 
   def pagedata
     epub.manifest.nav.content_document.navigation.items.map do |x|
@@ -74,5 +84,5 @@ class EPUBPreparer
       "created"  => entry.time }
   end
 
-  attr_reader :epub, :epub_path, :output
+  attr_reader :epub, :epub_path
 end
