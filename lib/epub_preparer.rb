@@ -5,9 +5,11 @@ require "epub/parser"
 require "digest"
 
 class EPUBPreparer
-  def initialize(input, output)
-    @input = input
+  def initialize(epub_path, output)
+    @epub_path = epub_path
     @output = output
+
+    @epub = EPUB::Parser.parse(epub_path)
   end
 
   def run
@@ -28,19 +30,23 @@ class EPUBPreparer
     YAML.dump(
       "creation_date" => Time.parse("2017-12-06 08:06:00-05:00"),
       "creation_agent" => "umich",
-      "epub_contents" => epub_contents
+      "epub_contents" => epub_contents,
+      "pagedata" => pagedata,
     )
+  end
+
+  def pagedata
+    epub.manifest.nav.content_document.navigation.items.map {|x| [x.item.full_path.to_s, {"label" => x.text}]}.to_h
   end
 
   def epub_contents
     # for each... filename, checksum, mimetype, size, created
-    book = EPUB::Parser.parse(input)
-    zipfile = Zip::File.open(input) do |epubzip|
-      { "rootfile"  => book.rootfiles.map {|f| epub_file_info(epubzip, f) },
+    zipfile = Zip::File.open(epub_path) do |epubzip|
+      { "rootfile"  => epub.rootfiles.map {|f| epub_file_info(epubzip, f) },
         "container" => [epub_file_info(epubzip, path: "META-INF/container.xml", mimetype: "application/xml")],
         "mimetype"  => [epub_file_info(epubzip, path: "mimetype", mimetype: "text/plain")],
-        "manifest"  => book.manifest.items.map {|f| epub_file_info(epubzip, f) },
-        "spine"     => book.spine.items.map {|f| f.full_path.to_s } }
+        "manifest"  => epub.manifest.items.map {|f| epub_file_info(epubzip, f) },
+        "spine"     => epub.spine.items.map {|f| f.full_path.to_s } }
     end
   end
 
@@ -53,5 +59,5 @@ class EPUBPreparer
       "created"  => entry.time }
   end
 
-  attr_reader :input, :output
+  attr_reader :epub, :epub_path, :output
 end

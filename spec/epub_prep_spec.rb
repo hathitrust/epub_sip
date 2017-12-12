@@ -62,4 +62,5 @@ RSpec.describe EPUBPreparer do
   it "creates a zip with the pairtree-encoded version of the given id"
   it "copies the epub"
   it "creates a checksum file matching the fixture"
+  it "flattens nested navigation items"
 end
