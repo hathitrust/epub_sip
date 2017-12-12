@@ -3,6 +3,21 @@
 require "zip"
 require "epub/parser"
 require "digest"
+require "open3"
+
+class HTMLReader
+  def initialize(html)
+    @html = html
+  end
+
+  def plain_text
+    Open3.capture2("w3m -dump -T 'application/xhtml+xml'", :stdin_data => html)[0]
+  end
+
+  private
+
+  attr_reader :html
+end
 
 class EPUBPreparer
   def initialize(epub_path, output)
@@ -23,7 +38,19 @@ class EPUBPreparer
       zipfile.get_output_stream("meta.yml") do |f|
         f.write(meta_yml)
       end
+
+      n = 0
+      epub.spine.items.each do |item|
+        n += 1
+        zipfile.get_output_stream("%08d.txt" % n) do |f|
+          f.write(epub_item_to_plain_text(item))
+        end
+      end
     end
+  end
+
+  def epub_item_to_plain_text(epub_item)
+    HTMLReader.new(epub_item.content_document.read).plain_text
   end
 
   def meta_yml
@@ -36,7 +63,9 @@ class EPUBPreparer
   end
 
   def pagedata
-    epub.manifest.nav.content_document.navigation.items.map {|x| [x.item.full_path.to_s, {"label" => x.text}]}.to_h
+    epub.manifest.nav.content_document.navigation.items.map do |x|
+      [x.item.full_path.to_s, {"label" => x.text}]
+    end.to_h
   end
 
   def epub_contents

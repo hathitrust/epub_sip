@@ -7,6 +7,21 @@ require "epub_preparer"
 require "yaml"
 require "pry"
 
+RSpec.describe HTMLReader do
+  [
+    ["", ""],
+    ["plain text", "plain text\n"],
+    ["<html><em>fancy text</em></html>", "fancy text\n"],
+    ["<html>two<br>lines</html>", "two\nlines\n"],
+    ["<html><p>two</p><p>paragraphs</p></html>", "two\n\nparagraphs\n\n"],
+    ["©", "©\n"],
+  ].each do |html, plain|
+    it "#plain_text into #{plain.inspect}" do
+      expect(HTMLReader.new(html).plain_text).to eql(plain)
+    end
+  end
+end
+
 RSpec.describe EPUBPreparer do
   let(:fixture) { File.dirname(__FILE__) + "/support/fixtures/ark+\=87302\=t00000001" }
   let(:input) { "#{fixture}/test.epub" }
@@ -35,6 +50,12 @@ RSpec.describe EPUBPreparer do
     end
   end
 
+  def compare_text(seq)
+    zip_entry("%08d.txt" % seq) do |entry|
+      expect(entry.get_input_stream.read.force_encoding("utf-8")).to eql(File.read("#{fixture}/%08d.txt" % seq))
+    end
+  end
+
   before(:each) do
     output.close
   end
@@ -58,7 +79,13 @@ RSpec.describe EPUBPreparer do
     end
   end
 
-  it "extracts text matching the fixture"
+  1.upto(5) do |i|
+    it "extracts text matching the fixture for seq=#{i}" do
+      subject.run
+      compare_text(i)
+    end
+  end
+
   it "creates a zip with the pairtree-encoded version of the given id"
   it "copies the epub"
   it "creates a checksum file matching the fixture"
