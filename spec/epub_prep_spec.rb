@@ -7,21 +7,6 @@ require "epub_preparer"
 require "yaml"
 require "pry"
 
-RSpec.describe HTMLReader do
-  [
-    ["", ""],
-    ["plain text", "plain text\n"],
-    ["<html><em>fancy text</em></html>", "fancy text\n"],
-    ["<html>two<br>lines</html>", "two\nlines\n"],
-    ["<html><p>two</p><p>paragraphs</p></html>", "two\n\nparagraphs\n\n"],
-    ["©", "©\n"],
-  ].each do |html, plain|
-    it "#plain_text into #{plain.inspect}" do
-      expect(HTMLReader.new(html).plain_text).to eql(plain)
-    end
-  end
-end
-
 RSpec.describe EPUBPreparer do
   let(:fixture) { File.dirname(__FILE__) + "/support/fixtures/ark+\=87302\=t00000001" }
   let(:input) { "#{fixture}/test.epub" }
