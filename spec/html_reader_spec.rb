@@ -3,6 +3,17 @@
 require "spec_helper"
 require "html_reader"
 
+RSpec.describe Capture2 do
+  it "can pipe input into cat" do
+    expect(Capture2.new("cat").run("cheezburger")).to eql("cheezburger")
+  end
+
+  it "raises an exception on nonzero exit status" do
+    expect { Capture2.new("false").run("") }.to raise_error(
+      RuntimeError, "Received exit status 1 on command: false")
+  end
+end
+
 RSpec.describe HTMLReader do
   [
     ["", ""],
