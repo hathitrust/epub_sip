@@ -42,9 +42,9 @@ RSpec.describe EPUB::SIPWriter do
     end
   end
 
-  def compare_text(seq)
-    zip_entry("%08d.txt" % seq) do |entry|
-      expect(entry.get_input_stream.read.force_encoding("utf-8")).to eql(File.read("#{fixture}/%08d.txt" % seq))
+  def compare_text(filename)
+    zip_entry(filename) do |entry|
+      expect(entry.get_input_stream.read.force_encoding("utf-8")).to eql(File.read("#{fixture}/#{filename}"))
     end
   end
 
@@ -74,7 +74,7 @@ RSpec.describe EPUB::SIPWriter do
   1.upto(5) do |i|
     it "extracts text matching the fixture for seq=#{i}" do
       subject.write_zip output.path
-      compare_text(i)
+      compare_text("%08d.txt" % i)
     end
   end
 
@@ -83,6 +83,12 @@ RSpec.describe EPUB::SIPWriter do
     expect(zip_find("#{pt_objid}.epub")).not_to be(nil)
   end
 
-  it "creates a checksum file matching the fixture"
+  it "creates a checksum file matching the fixture" do
+    subject.write_zip output.path
+    zip_entry("checksum.md5") do |entry|
+      expect(entry.get_input_stream.read.count("\n")).to eql(File.read("#{fixture}/checksum.md5").count("\n"))
+    end
+  end
+
   it "flattens nested navigation items"
 end

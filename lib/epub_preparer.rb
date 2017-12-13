@@ -15,6 +15,11 @@ class EPUB::SIPWriter
     preparer = EPUB::Preparer.new(epub_path)
 
     Zip::File.open(output, Zip::File::CREATE) do |zipfile|
+      sums = {}
+      zipfile.add("#{pt_objid}.epub", epub_path)
+      sums["#{pt_objid}.epub"] = Digest::MD5.hexdigest(File.read(epub_path))
+
+      sums["meta.yml"] = Digest::MD5.hexdigest(preparer.meta_yml)
       zipfile.get_output_stream("meta.yml") do |f|
         f.write(preparer.meta_yml)
       end
@@ -22,12 +27,17 @@ class EPUB::SIPWriter
       n = 0
       preparer.spine_pages.each do |page|
         n += 1
+        sums["%08d.txt" % n] = Digest::MD5.hexdigest(HTMLReader.new(page).plain_text)
         zipfile.get_output_stream("%08d.txt" % n) do |f|
           f.write(HTMLReader.new(page).plain_text)
         end
       end
 
-      zipfile.add("#{pt_objid}.epub", epub_path)
+      zipfile.get_output_stream("checksum.md5") do |f|
+        sums.to_a.sort.each do |filename, hash|
+          f.write("#{hash}  #{filename}\n")
+        end
+      end
     end
   end
 
