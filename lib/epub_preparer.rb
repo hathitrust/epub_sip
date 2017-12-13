@@ -34,23 +34,16 @@ class EPUB::ZipFileWriter
   def self.open(output)
     Zip::File.open(output, Zip::File::CREATE) do |zipfile|
       writer = EPUB::ZipFileWriter.new(zipfile)
+
       yield writer
 
-      zipfile.get_output_stream("checksum.md5") do |f|
-        writer.filenames_and_checksums.each do |filename, checksum|
-          f.write("#{checksum}  #{filename}\n")
-        end
-      end
+      writer.write_checksums
     end
   end
 
   def initialize(zipfile)
     @zipfile = zipfile
     @checksums = {}
-  end
-
-  def filenames_and_checksums
-    checksums.to_a.sort
   end
 
   def write_data(outfile, data)
@@ -61,6 +54,14 @@ class EPUB::ZipFileWriter
   def copy_file(outfile, infile)
     checksums[outfile] = Digest::MD5.hexdigest(File.read(infile))
     zipfile.add(outfile, infile)
+  end
+
+  def write_checksums
+    zipfile.get_output_stream("checksum.md5") do |f|
+      checksums.to_a.sort.each do |filename, checksum|
+        f.write("#{checksum}  #{filename}\n")
+      end
+    end
   end
 
   private
