@@ -22,6 +22,8 @@ class EPUB::SIPWriter
         n += 1
         writer.write_data("%08d.txt" % n, HTMLReader.new(page).plain_text)
       end
+
+      writer.write_checksums("checksum.md5")
     end
   end
 
@@ -34,10 +36,7 @@ class EPUB::ZipFileWriter
   def self.open(output)
     Zip::File.open(output, Zip::File::CREATE) do |zipfile|
       writer = EPUB::ZipFileWriter.new(zipfile)
-
       yield writer
-
-      writer.write_checksums
     end
   end
 
@@ -46,18 +45,18 @@ class EPUB::ZipFileWriter
     @checksums = {}
   end
 
-  def write_data(outfile, data)
-    checksums[outfile] = Digest::MD5.hexdigest(data)
-    zipfile.get_output_stream(outfile) { |f| f.write(data) }
-  end
-
   def copy_file(outfile, infile)
     checksums[outfile] = Digest::MD5.hexdigest(File.read(infile))
     zipfile.add(outfile, infile)
   end
 
-  def write_checksums
-    zipfile.get_output_stream("checksum.md5") do |f|
+  def write_data(outfile, data)
+    checksums[outfile] = Digest::MD5.hexdigest(data)
+    zipfile.get_output_stream(outfile) { |f| f.write(data) }
+  end
+
+  def write_checksums(outfile)
+    zipfile.get_output_stream(outfile) do |f|
       checksums.to_a.sort.each do |filename, checksum|
         f.write("#{checksum}  #{filename}\n")
       end
