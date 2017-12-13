@@ -13,30 +13,14 @@ class EPUB::SIPWriter
 
   def write_zip(output)
     preparer = EPUB::Preparer.new(epub_path)
-
-    Zip::File.open(output, Zip::File::CREATE) do |zipfile|
-      sums = {}
-      zipfile.add("#{pt_objid}.epub", epub_path)
-      sums["#{pt_objid}.epub"] = Digest::MD5.hexdigest(File.read(epub_path))
-
-      sums["meta.yml"] = Digest::MD5.hexdigest(preparer.meta_yml)
-      zipfile.get_output_stream("meta.yml") do |f|
-        f.write(preparer.meta_yml)
-      end
+    EPUB::ZipFileWriter.open(output) do |writer|
+      writer.copy_file("#{pt_objid}.epub", epub_path)
+      writer.write_data("meta.yml", preparer.meta_yml)
 
       n = 0
       preparer.spine_pages.each do |page|
         n += 1
-        sums["%08d.txt" % n] = Digest::MD5.hexdigest(HTMLReader.new(page).plain_text)
-        zipfile.get_output_stream("%08d.txt" % n) do |f|
-          f.write(HTMLReader.new(page).plain_text)
-        end
-      end
-
-      zipfile.get_output_stream("checksum.md5") do |f|
-        sums.to_a.sort.each do |filename, hash|
-          f.write("#{hash}  #{filename}\n")
-        end
+        writer.write_data("%08d.txt" % n, HTMLReader.new(page).plain_text)
       end
     end
   end
@@ -44,6 +28,44 @@ class EPUB::SIPWriter
   private
 
   attr_reader :pt_objid, :epub_path
+end
+
+class EPUB::ZipFileWriter
+  def self.open(output)
+    Zip::File.open(output, Zip::File::CREATE) do |zipfile|
+      writer = EPUB::ZipFileWriter.new(zipfile)
+      yield writer
+
+      zipfile.get_output_stream("checksum.md5") do |f|
+        writer.filenames_and_checksums.each do |filename, checksum|
+          f.write("#{checksum}  #{filename}\n")
+        end
+      end
+    end
+  end
+
+  def initialize(zipfile)
+    @zipfile = zipfile
+    @checksums = {}
+  end
+
+  def filenames_and_checksums
+    checksums.to_a.sort
+  end
+
+  def write_data(outfile, data)
+    checksums[outfile] = Digest::MD5.hexdigest(data)
+    zipfile.get_output_stream(outfile) { |f| f.write(data) }
+  end
+
+  def copy_file(outfile, infile)
+    checksums[outfile] = Digest::MD5.hexdigest(File.read(infile))
+    zipfile.add(outfile, infile)
+  end
+
+  private
+
+  attr_reader :zipfile, :checksums
 end
 
 class EPUB::Preparer

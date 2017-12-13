@@ -90,5 +90,6 @@ RSpec.describe EPUB::SIPWriter do
     end
   end
 
+  # can't test this without a new fixture
   it "flattens nested navigation items"
 end
