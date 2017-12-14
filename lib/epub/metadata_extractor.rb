@@ -13,13 +13,13 @@ module EPUB
       @epub = Parser.parse(epub_path)
     end
 
-    def meta_yml
-      YAML.dump(
-        "creation_date" => Time.parse("2017-12-06 08:06:00-05:00"),
+    def metadata
+      {
+        "creation_date"  => Time.parse("2017-12-06 08:06:00-05:00"),
         "creation_agent" => "umich",
-        "epub_contents" => epub_contents,
-        "pagedata" => pagedata
-      )
+        "epub_contents"  => epub_contents,
+        "pagedata"       => pagedata
+      }
     end
 
     def spine_pages

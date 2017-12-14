@@ -7,16 +7,42 @@ require "epub_sip"
 require "yaml"
 require "pry"
 
-RSpec.describe EPUB::SIPWriter do
-  let(:pt_objid) { "ark+=87302=t00000001" }
-  let(:fixture) { File.dirname(__FILE__) + "/../support/fixtures/#{pt_objid}" }
+RSpec.shared_context "with epub fixtures" do
   let(:input) { "#{fixture}/test.epub" }
+  let(:fixture) { File.dirname(__FILE__) + "/../support/fixtures/#{pt_objid}" }
+  let(:pt_objid) { "ark+=87302=t00000001" }
+end
+
+RSpec.describe EPUB::MetadataExtractor do
+  include_context "with epub fixtures"
+
+  let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml"), [Time]) }
+  let(:subject) { described_class.new(input) }
+
+  describe "#metadata" do
+    def compare_metadata_part(finder)
+      expect(finder.call(subject.metadata)).to eql(finder.call(meta_yml))
+    end
+
+    ["container", "mimetype", "rootfile", "manifest", "spine"].each do |subsec|
+      it "returns metadata matching the fixture's epub_contents #{subsec} " do
+        compare_metadata_part(->(x) { x["epub_contents"][subsec] })
+      end
+    end
+
+    ["creation_date", "creation_agent", "pagedata"].each do |section|
+      it "returns metadata matching the fixture's #{section} " do
+        compare_metadata_part(->(x) { x[section] })
+      end
+    end
+  end
+end
+
+RSpec.describe EPUB::SIPWriter do
+  include_context "with epub fixtures"
+
   let(:output) { Tempfile.new("epubprep") }
   let(:subject) { described_class.new(pt_objid, input) }
-
-  def yaml_safe_load(data)
-    YAML.safe_load(data, [Time])
-  end
 
   def zip_entry(filename)
     Zip::File.open(output.path) do |zipfile|
@@ -27,18 +53,6 @@ RSpec.describe EPUB::SIPWriter do
   def zip_find(filename)
     Zip::File.open(output.path) do |zipfile|
       zipfile.find_entry(filename)
-    end
-  end
-
-  def compare_yml_subsec(section, subsection)
-    zip_entry("meta.yml") do |entry|
-      expect(yaml_safe_load(entry.get_input_stream.read)[section][subsection]).to eql(yaml_safe_load(File.read("#{fixture}/meta.yml"))[section][subsection])
-    end
-  end
-
-  def compare_yml_sec(section)
-    zip_entry("meta.yml") do |entry|
-      expect(yaml_safe_load(entry.get_input_stream.read)[section]).to eql(yaml_safe_load(File.read("#{fixture}/meta.yml"))[section])
     end
   end
 
@@ -55,20 +69,6 @@ RSpec.describe EPUB::SIPWriter do
   after(:each) do
     output.close
     output.unlink
-  end
-
-  ["container", "mimetype", "rootfile", "manifest", "spine"].each do |subsec|
-    it "creates a meta.yml file matching the fixture's epub_contents #{subsec} " do
-      subject.write_zip output.path
-      compare_yml_subsec("epub_contents", subsec)
-    end
-  end
-
-  ["creation_date", "creation_agent", "pagedata"].each do |section|
-    it "creates a meta.yml file matching the fixture's #{section} " do
-      subject.write_zip output.path
-      compare_yml_sec(section)
-    end
   end
 
   1.upto(5) do |i|

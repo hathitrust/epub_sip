@@ -16,7 +16,7 @@ module EPUB
     def write_zip(output)
       ZipFileWriter.open(output) do |writer|
         writer.copy_file("#{pt_objid}.epub", epub_path)
-        writer.write_data("meta.yml", metadata_extractor.meta_yml)
+        writer.write_data("meta.yml", YAML.dump(metadata_extractor.metadata))
 
         write_ocr(writer)
 
