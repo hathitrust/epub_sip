@@ -10,15 +10,15 @@ module EPUB
     def initialize(pt_objid, epub_path)
       @pt_objid = pt_objid
       @epub_path = epub_path
+      @metadata_extractor = MetadataExtractor.new(epub_path)
     end
 
     def write_zip(output)
-      metadata_extractor = MetadataExtractor.new(epub_path)
       ZipFileWriter.open(output) do |writer|
         writer.copy_file("#{pt_objid}.epub", epub_path)
         writer.write_data("meta.yml", metadata_extractor.meta_yml)
 
-        write_ocr(metadata_extractor, writer)
+        write_ocr(writer)
 
         writer.write_checksums("checksum.md5")
       end
@@ -26,7 +26,7 @@ module EPUB
 
     private
 
-    def write_ocr(metadata_extractor, writer)
+    def write_ocr(writer)
       n = 0
       metadata_extractor.spine_pages.each do |page|
         n += 1
@@ -34,6 +34,6 @@ module EPUB
       end
     end
 
-    attr_reader :pt_objid, :epub_path
+    attr_reader :pt_objid, :epub_path, :metadata_extractor
   end
 end

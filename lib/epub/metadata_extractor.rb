@@ -36,38 +36,40 @@ module EPUB
 
     def epub_contents
       # for each... filename, checksum, mimetype, size, created
-      Zip::File.open(epub_path) do |epubzip|
-        { "rootfile"  => epub_items_info(epub.rootfiles, epubzip),
-          "container" => [container_info(epubzip)],
-          "mimetype"  => [mimetype_info(epubzip)],
-          "manifest"  => epub_items_info(epub.manifest.items, epubzip),
-          "spine"     => spine_items }
+      { "rootfile"  => epub_items_info(epub.rootfiles),
+        "container" => [container_info],
+        "mimetype"  => [mimetype_info],
+        "manifest"  => epub_items_info(epub.manifest.items),
+        "spine"     => spine_items }
+    end
+
+    def epub_file_info(file = nil, path: file.full_path.to_s, mimetype: file.media_type)
+      Zip::File.open(epub_path) do |epub_zip|
+        entry = epub_zip.get_entry(path)
+        { "filename" => path,
+          "checksum" => Digest::MD5.new.update(entry.get_input_stream.read).hexdigest,
+          "mimetype" => mimetype,
+          "size"     => entry.size,
+          "created"  => entry.time }
       end
     end
 
-    def epub_file_info(zip, file = nil, path: file.full_path.to_s, mimetype: file.media_type)
-      entry = zip.get_entry(path)
-      { "filename" => path,
-        "checksum" => Digest::MD5.new.update(entry.get_input_stream.read).hexdigest,
-        "mimetype" => mimetype,
-        "size"     => entry.size,
-        "created"  => entry.time }
-    end
-
-    def container_info(epubzip)
-      epub_file_info(epubzip,
+    def container_info
+      epub_file_info(
         path: "META-INF/container.xml",
-        mimetype: "application/xml")
+        mimetype: "application/xml"
+)
     end
 
-    def mimetype_info(epubzip)
-      epub_file_info(epubzip,
+    def mimetype_info
+      epub_file_info(
         path: "mimetype",
-        mimetype: "text/plain")
+        mimetype: "text/plain"
+)
     end
 
-    def epub_items_info(items, epubzip)
-      items.map {|f| epub_file_info(epubzip, f) }
+    def epub_items_info(items)
+      items.map {|f| epub_file_info(f) }
     end
 
     def spine_items
