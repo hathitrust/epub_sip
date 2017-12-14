@@ -74,7 +74,7 @@ RSpec.describe EPUB::SIPWriter do
   1.upto(5) do |i|
     it "extracts text matching the fixture for seq=#{i}" do
       subject.write_zip output.path
-      compare_text("%08d.txt" % i)
+      compare_text(format("%08d.txt", i))
     end
   end
 

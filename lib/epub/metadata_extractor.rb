@@ -5,6 +5,7 @@ require "epub/parser"
 require "digest"
 
 module EPUB
+  # Extracts metadata from an epub in the form needed for meta.yml
   class MetadataExtractor
     def initialize(epub_path)
       @epub_path = epub_path
@@ -17,30 +18,30 @@ module EPUB
         "creation_date" => Time.parse("2017-12-06 08:06:00-05:00"),
         "creation_agent" => "umich",
         "epub_contents" => epub_contents,
-        "pagedata" => pagedata,
+        "pagedata" => pagedata
       )
     end
 
     def spine_pages
-      epub.spine.items.map {|item| item.content_document.read}
+      epub.spine.items.map {|item| item.content_document.read }
     end
 
     private
 
     def pagedata
       epub.manifest.nav.content_document.navigation.items.map do |x|
-        [x.item.full_path.to_s, {"label" => x.text}]
+        [x.item.full_path.to_s, { "label" => x.text }]
       end.to_h
     end
 
     def epub_contents
       # for each... filename, checksum, mimetype, size, created
-      zipfile = Zip::File.open(epub_path) do |epubzip|
-        { "rootfile"  => epub.rootfiles.map {|f| epub_file_info(epubzip, f) },
-          "container" => [epub_file_info(epubzip, path: "META-INF/container.xml", mimetype: "application/xml")],
-          "mimetype"  => [epub_file_info(epubzip, path: "mimetype", mimetype: "text/plain")],
-          "manifest"  => epub.manifest.items.map {|f| epub_file_info(epubzip, f) },
-          "spine"     => epub.spine.items.map {|f| f.full_path.to_s } }
+      Zip::File.open(epub_path) do |epubzip|
+        { "rootfile"  => epub_items_info(epub.rootfiles, epubzip),
+          "container" => [container_info(epubzip)],
+          "mimetype"  => [mimetype_info(epubzip)],
+          "manifest"  => epub_items_info(epub.manifest.items, epubzip),
+          "spine"     => spine_items }
       end
     end
 
@@ -51,6 +52,26 @@ module EPUB
         "mimetype" => mimetype,
         "size"     => entry.size,
         "created"  => entry.time }
+    end
+
+    def container_info(epubzip)
+      epub_file_info(epubzip,
+        path: "META-INF/container.xml",
+        mimetype: "application/xml")
+    end
+
+    def mimetype_info(epubzip)
+      epub_file_info(epubzip,
+        path: "mimetype",
+        mimetype: "text/plain")
+    end
+
+    def epub_items_info(items, epubzip)
+      items.map {|f| epub_file_info(epubzip, f) }
+    end
+
+    def spine_items
+      epub.spine.items.map {|f| f.full_path.to_s }
     end
 
     attr_reader :epub, :epub_path

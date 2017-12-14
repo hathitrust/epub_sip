@@ -4,6 +4,7 @@ require "zip"
 require "digest"
 
 module EPUB
+  # Generates a zip file with checksum.md5
   class ZipFileWriter
     def self.open(output)
       Zip::File.open(output, Zip::File::CREATE) do |zipfile|
@@ -24,7 +25,7 @@ module EPUB
 
     def write_data(outfile, data)
       checksums[outfile] = Digest::MD5.hexdigest(data)
-      zipfile.get_output_stream(outfile) { |f| f.write(data) }
+      zipfile.get_output_stream(outfile) {|f| f.write(data) }
     end
 
     def write_checksums(outfile)
