@@ -10,7 +10,8 @@ RSpec.describe Capture2 do
 
   it "raises an exception on nonzero exit status" do
     expect { Capture2.new("false").run("") }.to raise_error(
-      RuntimeError, "Received exit status 1 on command: false")
+      RuntimeError, "Received exit status 1 on command: false"
+)
   end
 end
 
@@ -21,7 +22,7 @@ RSpec.describe HTMLReader do
     ["<html><em>fancy text</em></html>", "fancy text\n"],
     ["<html>two<br>lines</html>", "two\nlines\n"],
     ["<html><p>two</p><p>paragraphs</p></html>", "two\n\nparagraphs\n\n"],
-    ["©", "©\n"],
+    ["©", "©\n"]
   ].each do |html, plain|
     it "#plain_text into #{plain.inspect}" do
       expect(HTMLReader.new(html).plain_text).to eql(plain)

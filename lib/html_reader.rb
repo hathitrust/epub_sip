@@ -2,14 +2,15 @@
 
 require "open3"
 
+# dependency-injectable runner that captures stdout and exit status
 class Capture2
   def initialize(command)
     @command = command
   end
 
   def run(stdin_data)
-    stdout_data, exit_status = Open3.capture2(command, :stdin_data => stdin_data)
-    if exit_status.exitstatus == 0
+    stdout_data, exit_status = Open3.capture2(command, stdin_data: stdin_data)
+    if exit_status.exitstatus.zero?
       stdout_data
 
     else
@@ -22,6 +23,7 @@ class Capture2
   attr_reader :command
 end
 
+# wrapper for w3m -dump
 class HTMLReader
   def initialize(html)
     @html = html
