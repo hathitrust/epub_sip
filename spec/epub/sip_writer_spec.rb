@@ -3,13 +3,13 @@
 require "spec_helper"
 require "tempfile"
 require "zip"
-require "epub_preparer"
+require "epub_sip"
 require "yaml"
 require "pry"
 
 RSpec.describe EPUB::SIPWriter do
   let(:pt_objid) { "ark+=87302=t00000001" }
-  let(:fixture) { File.dirname(__FILE__) + "/support/fixtures/#{pt_objid}" }
+  let(:fixture) { File.dirname(__FILE__) + "/../support/fixtures/#{pt_objid}" }
   let(:input) { "#{fixture}/test.epub" }
   let(:output) { Tempfile.new("epubprep") }
   let(:subject) { described_class.new(pt_objid, input) }
