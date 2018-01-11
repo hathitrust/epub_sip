@@ -7,25 +7,40 @@ require "yaml"
 require_relative "./fixtures"
 
 RSpec.describe EPUB::MetadataExtractor do
-  include_context "with epub fixtures"
-
   describe "#metadata" do
-    let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml"), [Time]) }
-    let(:subject) { described_class.new(input) }
 
-    def compare_metadata_part(finder)
-      expect(finder.call(subject.metadata)).to eql(finder.call(meta_yml))
-    end
+    context "with an epub with a flat nav" do
+      include_context "with simple epub fixtures"
+      subject { described_class.new(simple_epub) }
 
-    ["container", "mimetype", "rootfile", "manifest", "spine"].each do |subsec|
-      it "returns metadata matching the fixture's epub_contents #{subsec} " do
-        compare_metadata_part(->(x) { x["epub_contents"][subsec] })
+      let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml"), [Time]) }
+
+      def compare_metadata_part(finder)
+        expect(finder.call(subject.metadata)).to eql(finder.call(meta_yml))
+      end
+
+      ["container", "mimetype", "rootfile", "manifest", "spine"].each do |subsec|
+        it "returns metadata matching the fixture's epub_contents #{subsec} " do
+          compare_metadata_part(->(x) { x["epub_contents"][subsec] })
+        end
+      end
+
+      ["creation_date", "creation_agent", "pagedata"].each do |section|
+        it "returns metadata matching the fixture's #{section} " do
+          compare_metadata_part(->(x) { x[section] })
+        end
       end
     end
 
-    ["creation_date", "creation_agent", "pagedata"].each do |section|
-      it "returns metadata matching the fixture's #{section} " do
-        compare_metadata_part(->(x) { x[section] })
+    context "with a epub with nested hierarchy" do
+      let(:fixture) { File.dirname(__FILE__) + "/../support/fixtures" } 
+      let(:nested_epub) { "#{fixture}/test_nested.epub" }
+      let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/test_nested_meta.yml"), [Time]) } 
+
+      subject { described_class.new(nested_epub) } 
+
+      it "returns metadata matching the fixture's pagedata" do
+        expect(subject.metadata["pagedata"]).to eql(meta_yml["pagedata"])
       end
     end
   end
@@ -34,6 +49,7 @@ RSpec.describe EPUB::MetadataExtractor do
     let(:mock_epub) { double(:epub) }
     let(:nav_items) { [double(:item,
                               item: double(:foo, full_path: "/foo/bar.html"),
+                              items: [],
                               text: test_label) ] }
 
     before(:each) do
@@ -45,7 +61,7 @@ RSpec.describe EPUB::MetadataExtractor do
 
     it "removes whitespace from page labels" do
       expect(described_class.new("/some/path",mock_epub).pagedata)
-        .to eql({ "/foo/bar.html" => { "label" => "SUBJECT INDEX" } })
+        .to eql([[ "/foo/bar.html", { "label" => "SUBJECT INDEX" } ]])
     end
   end
 
