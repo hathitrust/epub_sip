@@ -3,6 +3,7 @@
 require "html_reader"
 require "epub/metadata_extractor"
 require "epub/zip_file_writer"
+require "yaml"
 
 module EPUB
   # Given an epub, generates a HathiTrust SIP

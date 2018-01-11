@@ -9,10 +9,10 @@ require_relative "./fixtures"
 RSpec.describe EPUB::MetadataExtractor do
   include_context "with epub fixtures"
 
-  let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml"), [Time]) }
-  let(:subject) { described_class.new(input) }
-
   describe "#metadata" do
+    let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml"), [Time]) }
+    let(:subject) { described_class.new(input) }
+
     def compare_metadata_part(finder)
       expect(finder.call(subject.metadata)).to eql(finder.call(meta_yml))
     end
@@ -29,4 +29,24 @@ RSpec.describe EPUB::MetadataExtractor do
       end
     end
   end
+
+  describe "#pagedata" do
+    let(:mock_epub) { double(:epub) }
+    let(:nav_items) { [double(:item,
+                              item: double(:foo, full_path: "/foo/bar.html"),
+                              text: test_label) ] }
+
+    before(:each) do
+      allow(mock_epub).to receive_message_chain(:manifest, :nav,
+        :content_document, :navigation, :items) { nav_items }
+    end
+
+    let(:test_label) { "\n SUBJECT INDEX\n " }
+
+    it "removes whitespace from page labels" do
+      expect(described_class.new("/some/path",mock_epub).pagedata)
+        .to eql({ "/foo/bar.html" => { "label" => "SUBJECT INDEX" } })
+    end
+  end
+
 end
