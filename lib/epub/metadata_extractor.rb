@@ -7,10 +7,9 @@ require "digest"
 module EPUB
   # Extracts metadata from an epub in the form needed for meta.yml
   class MetadataExtractor
-    def initialize(epub_path)
+    def initialize(epub_path, epub = Parser.parse(epub_path))
       @epub_path = epub_path
-
-      @epub = Parser.parse(epub_path)
+      @epub = epub
     end
 
     def metadata
@@ -26,13 +25,13 @@ module EPUB
       epub.spine.items.map {|item| item.content_document.read }
     end
 
-    private
-
     def pagedata
       epub.manifest.nav.content_document.navigation.items.map do |x|
-        [x.item.full_path.to_s, { "label" => x.text }]
+        [x.item.full_path.to_s, { "label" => x.text.strip }]
       end.to_h
     end
+
+    private
 
     def epub_contents
       # for each... filename, checksum, mimetype, size, created
