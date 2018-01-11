@@ -17,7 +17,7 @@ module EPUB
         "creation_date"  => Time.parse("2017-12-06 08:06:00-05:00"),
         "creation_agent" => "umich",
         "epub_contents"  => epub_contents,
-        "pagedata"       => pagedata
+        "pagedata"       => pagedata.to_h
       }
     end
 
@@ -25,10 +25,10 @@ module EPUB
       epub.spine.items.map {|item| item.content_document.read }
     end
 
-    def pagedata
-      epub.manifest.nav.content_document.navigation.items.map do |x|
+    def pagedata(nav=epub.manifest.nav.content_document)
+      nav.contents.reject { |x| x.item.nil? }.map do |x|
         [x.item.full_path.to_s, { "label" => x.text.strip }]
-      end.to_h
+      end
     end
 
     private
