@@ -1,3 +1,10 @@
+PATH
+  remote: .
+  specs:
+    epub_sip (0.01)
+      epub-parser
+      rubyzip
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -33,7 +40,7 @@ GEM
     rainbow (2.2.2)
       rake
     rake (12.3.0)
-    rchardet (1.6.1)
+    rchardet (1.7.0)
     rspec (3.7.0)
       rspec-core (~> 3.7.0)
       rspec-expectations (~> 3.7.0)
@@ -67,11 +74,11 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  epub-parser
+  bundler (~> 1.15)
+  epub_sip!
   pry
-  rspec
+  rspec (~> 3.0)
   rubocop
-  rubyzip
   simplecov
 
 BUNDLED WITH
