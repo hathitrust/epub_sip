@@ -7,10 +7,10 @@ require "epub/sip_writer"
 require_relative "./fixtures"
 
 RSpec.describe EPUB::SIPWriter do
-  include_context "with epub fixtures"
+  include_context "with simple epub fixtures"
 
   let(:output) { Tempfile.new("epubprep") }
-  let(:subject) { described_class.new(pt_objid, input) }
+  let(:subject) { described_class.new(pt_objid, simple_epub) }
 
   def zip_entry(filename)
     Zip::File.open(output.path) do |zipfile|
@@ -57,7 +57,4 @@ RSpec.describe EPUB::SIPWriter do
       expect(entry.get_input_stream.read.count("\n")).to eql(File.read("#{fixture}/checksum.md5").count("\n"))
     end
   end
-
-  # can't test this without a new fixture
-  it "flattens nested navigation items"
 end
