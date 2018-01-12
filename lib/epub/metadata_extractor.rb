@@ -25,9 +25,9 @@ module EPUB
       epub.spine.items.map {|item| item.content_document.read }
     end
 
-    def pagedata(nav=epub.manifest.nav.content_document)
-      nav.contents.reject { |x| x.item.nil? }.map do |x|
-        [x.item.full_path.to_s, { "label" => x.text.strip }]
+    def pagedata(nav=epub.nav.content_document)
+      nav.contents.reject { |x| x.href.nil? }.map do |x|
+        [nav.item.full_path.join(x.href).to_s, { "label" => x.text.strip }]
       end
     end
 

@@ -31,15 +31,17 @@ RSpec.describe EPUB::MetadataExtractor do
       end
     end
 
-    context "with a epub with nested hierarchy" do
-      let(:fixture) { File.dirname(__FILE__) + "/../support/fixtures" }
-      let(:nested_epub) { "#{fixture}/test_nested.epub" }
-      let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/test_nested_meta.yml"), [Time]) }
+    ["test_nested", "nested_dirs", "nested_dirs_traversal"].each do |basename|
+      context "with an epub #{basename}.epub with hierarchy in the toc or dirs" do
+        let(:fixtures) { File.dirname(__FILE__) + "/../support/fixtures" }
+        let(:epub) { "#{fixtures}/#{basename}.epub" }
+        let(:meta_yml) { YAML.safe_load(File.read("#{fixtures}/#{basename}_meta.yml"), [Time]) }
 
-      subject { described_class.new(nested_epub) }
+        subject { described_class.new(epub) }
 
-      it "returns metadata matching the fixture's pagedata" do
-        expect(subject.metadata["pagedata"]).to eql(meta_yml["pagedata"])
+        it "returns metadata matching the fixture's pagedata" do
+          expect(subject.metadata["pagedata"]).to eql(meta_yml["pagedata"])
+        end
       end
     end
   end
@@ -48,11 +50,11 @@ RSpec.describe EPUB::MetadataExtractor do
     let(:mock_epub) { double(:epub) }
     let(:item) do
       double(:item,
-        item: double(:foo, full_path: "/foo/bar.html"),
-        text: test_label)
+             href: "bar.html",
+             text: test_label)
     end
 
-    let(:nav) { double(:nav, contents: [item]) }
+    let(:nav) { double(:nav, contents: [item], item: double(:item, full_path: Addressable::URI.parse("/foo/nav.xhtml"))) }
 
     let(:test_label) { "\n SUBJECT INDEX\n " }
 
