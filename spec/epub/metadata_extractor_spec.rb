@@ -11,7 +11,7 @@ RSpec.describe EPUB::MetadataExtractor do
   describe "#metadata" do
     context "with an epub with a flat nav" do
       include_context "with simple epub fixtures"
-      subject { described_class.new(simple_epub, creation_agent: 'umich') }
+      subject { described_class.new(simple_epub, creation_agent: "umich") }
 
       let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml")) }
 

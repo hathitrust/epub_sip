@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 lib = File.expand_path("../lib", __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require "epub_sip"
@@ -5,8 +7,8 @@ require "epub_sip"
 Gem::Specification.new do |spec|
   spec.name          = "epub_sip"
   spec.version       = "0.01"
-  spec.authors       = ["Aaron Elkiss","Matt LaChance"]
-  spec.email         = ["aelkiss@umich.edu","mattlach@umich.edu"]
+  spec.authors       = ["Aaron Elkiss", "Matt LaChance"]
+  spec.email         = ["aelkiss@umich.edu", "mattlach@umich.edu"]
 
   spec.summary       = "epub_sip"
 
@@ -26,8 +28,8 @@ Gem::Specification.new do |spec|
   spec.executables   = spec.files.grep(%r{^exe/}) {|f| File.basename(f) }
   spec.require_paths = ["lib"]
 
-  spec.add_runtime_dependency "rubyzip"
   spec.add_runtime_dependency "epub-parser"
+  spec.add_runtime_dependency "rubyzip"
 
   spec.add_development_dependency "bundler", "~> 1.15"
   spec.add_development_dependency "pry"
