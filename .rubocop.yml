@@ -115,9 +115,6 @@ Layout/SpaceInsideBlockBraces:
 Style/SymbolArray:
   EnforcedStyle: brackets
 
-Style/WhileUntilModifier:
-  MaxLineLength: 100
-
 Lint/BlockAlignment:
   EnforcedStyleAlignWith: start_of_line
 

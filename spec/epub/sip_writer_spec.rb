@@ -10,7 +10,7 @@ RSpec.describe EPUB::SIPWriter do
   include_context "with simple epub fixtures"
 
   let(:output) { Tempfile.new("epubprep") }
-  let(:subject) { described_class.new(pt_objid, simple_epub) }
+  let(:subject) { described_class.new(pt_objid: pt_objid, epub_path: simple_epub, creation_agent: "foo") }
 
   def zip_entry(filename)
     Zip::File.open(output.path) do |zipfile|

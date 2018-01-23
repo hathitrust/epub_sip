@@ -5,19 +5,21 @@ require "epub/parser"
 require "digest"
 
 module EPUB
-  ISO8601_XSD_DATETIME="%FT%T%:z"
+  ISO8601_XSD_DATETIME = "%FT%T%:z"
 
   # Extracts metadata from an epub in the form needed for meta.yml
   class MetadataExtractor
-    def initialize(epub_path, epub = Parser.parse(epub_path))
+    def initialize(epub_path, epub: Parser.parse(epub_path),
+      creation_agent: epub.metadata.publishers.first.to_s)
       @epub_path = epub_path
       @epub = epub
+      @creation_agent = creation_agent
     end
 
     def metadata
       {
-        "creation_date"  => Time.parse("2017-12-06 08:06:00-05:00").strftime(ISO8601_XSD_DATETIME),
-        "creation_agent" => "umich",
+        "creation_date"  => epub.metadata.date.to_s,
+        "creation_agent" => creation_agent,
         "epub_contents"  => epub_contents,
         "pagedata"       => pagedata.to_h
       }
@@ -27,8 +29,8 @@ module EPUB
       epub.spine.items.map {|item| item.content_document.read }
     end
 
-    def pagedata(nav=epub.nav.content_document)
-      nav.contents.reject { |x| x.href.nil? }.map do |x|
+    def pagedata(nav = epub.nav.content_document)
+      nav.contents.reject {|x| x.href.nil? }.map do |x|
         [nav.item.full_path.join(x.href).to_s, { "label" => x.text.strip }]
       end
     end
@@ -77,6 +79,6 @@ module EPUB
       epub.spine.items.map {|f| f.full_path.to_s }
     end
 
-    attr_reader :epub, :epub_path
+    attr_reader :epub, :epub_path, :creation_agent
   end
 end

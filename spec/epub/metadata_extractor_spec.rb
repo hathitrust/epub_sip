@@ -11,7 +11,7 @@ RSpec.describe EPUB::MetadataExtractor do
   describe "#metadata" do
     context "with an epub with a flat nav" do
       include_context "with simple epub fixtures"
-      subject { described_class.new(simple_epub) }
+      subject { described_class.new(simple_epub, creation_agent: "umich") }
 
       let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml")) }
 
@@ -48,19 +48,30 @@ RSpec.describe EPUB::MetadataExtractor do
   end
 
   describe "#pagedata" do
-    let(:mock_epub) { double(:epub) }
-    let(:item) do
-      double(:item,
-             href: "bar.html",
-             text: test_label)
+    let(:mock_epub) do
+      double(:epub,
+        metadata: double(:metadata,
+          date: "1970-01-01T00:00:00Z"))
     end
 
-    let(:nav) { double(:nav, contents: [item], item: double(:item, full_path: Addressable::URI.parse("/foo/nav.xhtml"))) }
+    let(:item) do
+      double(:item,
+        href: "bar.html",
+        text: test_label)
+    end
+
+    let(:nav) do
+      double(:nav,
+        contents: [item],
+        item: double(:item, full_path: Addressable::URI.parse("/foo/nav.xhtml")))
+    end
 
     let(:test_label) { "\n SUBJECT INDEX\n " }
 
     it "removes whitespace from page labels" do
-      expect(described_class.new("/some/path", mock_epub).pagedata(nav))
+      expect(described_class.new("/some/path",
+        epub: mock_epub,
+        creation_agent: "somebody").pagedata(nav))
         .to eql([["/foo/bar.html", { "label" => "SUBJECT INDEX" }]])
     end
   end
