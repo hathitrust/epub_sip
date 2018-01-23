@@ -1,5 +1,5 @@
 ---
-creation_date: 2017-12-06 08:06:00.000000000 -05:00
+creation_date: "2017-12-06T08:06:00-05:00"
 creation_agent: umich
 epub_contents:
   rootfile:
@@ -7,35 +7,35 @@ epub_contents:
     checksum: 6cb76894dedfc24fe0132aca8badfa3b
     mimetype: application/oebps-package+xml
     size: 1852
-    created: 2018-01-12 09:37:09.000000000 -05:00
+    created: "2018-01-12T09:37:09-05:00"
   container:
   - filename: META-INF/container.xml
     checksum: 824c2ce6c9013f5353bbfe6598e6b372
     mimetype: application/xml
     size: 257
-    created: 2018-01-12 09:22:26.000000000 -05:00
+    created: "2018-01-12T09:22:26-05:00"
   mimetype:
   - filename: mimetype
     checksum: 4154e1f4f9c0e002cc44aae97103ebe2
     mimetype: text/plain
     size: 20
-    created: 2017-12-05 20:55:40.000000000 -05:00
+    created: "2017-12-05 20:55:40-05:00"
   manifest:
   - filename: nested/dir/toc.ncx
     checksum: 797e48d1e5e4cb0abeb12b53e72af3b2
     mimetype: application/x-dtbncx+xml
     size: 694
-    created: 2018-01-12 09:39:46.000000000 -05:00
+    created: "2018-01-12T09:39:46-05:00"
   - filename: nested/dir/text/toc.xhtml
     checksum: bc75aafa0796b561e1d1bb87fe06fe81
     mimetype: application/xhtml+xml
     size: 544
-    created: 2018-01-12 09:38:01.000000000 -05:00
+    created: "2018-01-12T09:38:01-05:00"
   - filename: nested/dir/text/2_chapter-1.xhtml
     checksum: e5d0d60ed4d2f7b595a4a2645df9ce6c
     mimetype: application/xhtml+xml
     size: 471
-    created: 2018-01-12 09:37:34.000000000 -05:00
+    created: "2018-01-12T09:37:34-05:00"
   spine:
   - nested/dir/text/toc.xhtml
   - nested/dir/text/2_chapter-1.xhtml

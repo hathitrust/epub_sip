@@ -5,6 +5,8 @@ require "epub/parser"
 require "digest"
 
 module EPUB
+  ISO8601_XSD_DATETIME="%FT%T%:z"
+
   # Extracts metadata from an epub in the form needed for meta.yml
   class MetadataExtractor
     def initialize(epub_path, epub = Parser.parse(epub_path))
@@ -14,7 +16,7 @@ module EPUB
 
     def metadata
       {
-        "creation_date"  => Time.parse("2017-12-06 08:06:00-05:00"),
+        "creation_date"  => Time.parse("2017-12-06 08:06:00-05:00").strftime(ISO8601_XSD_DATETIME),
         "creation_agent" => "umich",
         "epub_contents"  => epub_contents,
         "pagedata"       => pagedata.to_h
@@ -49,7 +51,7 @@ module EPUB
           "checksum" => Digest::MD5.new.update(entry.get_input_stream.read).hexdigest,
           "mimetype" => mimetype,
           "size"     => entry.size,
-          "created"  => entry.time }
+          "created"  => entry.time.strftime(ISO8601_XSD_DATETIME) }
       end
     end
 
