@@ -3,6 +3,7 @@
 require "spec_helper"
 require "epub/metadata_extractor"
 require "yaml"
+require "pry"
 
 require_relative "./fixtures"
 
@@ -12,7 +13,7 @@ RSpec.describe EPUB::MetadataExtractor do
       include_context "with simple epub fixtures"
       subject { described_class.new(simple_epub) }
 
-      let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml"), [Time]) }
+      let(:meta_yml) { YAML.safe_load(File.read("#{fixture}/meta.yml")) }
 
       def compare_metadata_part(finder)
         expect(finder.call(subject.metadata)).to eql(finder.call(meta_yml))
@@ -35,7 +36,7 @@ RSpec.describe EPUB::MetadataExtractor do
       context "with an epub #{basename}.epub with hierarchy in the toc or dirs" do
         let(:fixtures) { File.dirname(__FILE__) + "/../support/fixtures" }
         let(:epub) { "#{fixtures}/#{basename}.epub" }
-        let(:meta_yml) { YAML.safe_load(File.read("#{fixtures}/#{basename}_meta.yml"), [Time]) }
+        let(:meta_yml) { YAML.safe_load(File.read("#{fixtures}/#{basename}_meta.yml")) }
 
         subject { described_class.new(epub) }
 

@@ -1,5 +1,5 @@
 ---
-creation_date: 2017-12-06 08:06:00.000000000 -05:00
+creation_date: "2017-12-06T08:06:00-05:00"
 creation_agent: umich
 epub_contents:
   rootfile:
@@ -7,70 +7,70 @@ epub_contents:
     checksum: c3eeb6231a50589d8d54ed450dc60e31
     mimetype: application/oebps-package+xml
     size: 3114
-    created: 2018-01-11 13:27:57.000000000 -05:00
+    created: "2018-01-11T13:27:57-05:00"
   container:
   - filename: META-INF/container.xml
     checksum: bc793f50d0ec7ff556193c109f5d3afc
     mimetype: application/xml
     size: 239
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   mimetype:
   - filename: mimetype
     checksum: 4154e1f4f9c0e002cc44aae97103ebe2
     mimetype: text/plain
     size: 20
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   manifest:
   - filename: OEBPS/toc.ncx
     checksum: 589880004d5bd2bcb6b30b5ce9e9eaa3
     mimetype: application/x-dtbncx+xml
     size: 1825
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/toc.xhtml
     checksum: 03711ea9f0c3a2499bcd6e18458d90ac
     mimetype: application/xhtml+xml
     size: 1404
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/style.css
     checksum: c2e885ccf27a3e2ce7645686cb98aecd
     mimetype: text/css
     size: 6821
-    created: 2018-01-11 13:28:17.000000000 -05:00
+    created: "2018-01-11T13:28:17-05:00"
   - filename: OEBPS/0_no-title.xhtml
     checksum: fe665af3bfddabaf1837e46e12057e9d
     mimetype: application/xhtml+xml
     size: 337
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/1_no-title.xhtml
     checksum: b5ec670af20b75ad215260030a5a5e22
     mimetype: application/xhtml+xml
     size: 860
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/2_part-one.xhtml
     checksum: 3b45e7fa9d8bcb4ad13d6edf665c835d
     mimetype: application/xhtml+xml
     size: 407
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/3_chapter-1.xhtml
     checksum: b46505d4c242e9cc5f7bc7e20d8f0bf4
     mimetype: application/xhtml+xml
     size: 531
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/4_chapter-2.xhtml
     checksum: 715ed5c3ff6c577c211c5c6ae7aa51d2
     mimetype: application/xhtml+xml
     size: 503
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/5_part-two.xhtml
     checksum: bcdebe92d2626d591c2bae0b53f422df
     mimetype: application/xhtml+xml
     size: 408
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   - filename: OEBPS/6_chapter-3.xhtml
     checksum: ee2a1b56b21519466af8cb7fd5b02048
     mimetype: application/xhtml+xml
     size: 467
-    created: 2018-01-11 18:23:24.000000000 -05:00
+    created: "2018-01-11T18:23:24-05:00"
   spine:
   - OEBPS/0_no-title.xhtml
   - OEBPS/1_no-title.xhtml
