@@ -16,7 +16,7 @@ Say we have a directory full of epubs in `epub_sip/test_epub` and we want to cre
 ```bash
 mkdir test_output
 cd test_output
-for file in ../test_epub/*epub; do echo $file; be ruby ../bin/epub_sip $(basename $file .epub) $file; done
+for file in ../test_epub/*epub; do echo $file; be ruby ../bin/epub_sip $(basename $file .epub) creation_agent $file; done
 ```
 
 Then we can extract the generated meta.yml files:
