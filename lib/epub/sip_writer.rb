@@ -8,10 +8,10 @@ require "yaml"
 module EPUB
   # Given an epub, generates a HathiTrust SIP
   class SIPWriter
-    def initialize(pt_objid, epub_path)
+    def initialize(pt_objid:, epub_path:, creation_agent:)
       @pt_objid = pt_objid
       @epub_path = epub_path
-      @metadata_extractor = MetadataExtractor.new(epub_path)
+      @metadata_extractor = MetadataExtractor.new(epub_path, creation_agent: creation_agent)
     end
 
     def write_zip(output)

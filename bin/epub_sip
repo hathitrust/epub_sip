@@ -1,0 +1,11 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "bundler/setup"
+require_relative "../lib/epub_sip"
+
+(pt_objid, epub, creation_agent) = ARGV
+raise "Usage: #{$PROGRAM_NAME} pt_objid epub creation_agent" unless pt_objid && epub && creation_agent
+EPUB::SIPWriter.new(pt_objid: pt_objid,
+                    epub_path: epub,
+                    creation_agent: creation_agent).write_zip("#{pt_objid}.zip")
